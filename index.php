@@ -23,8 +23,10 @@ spl_autoload_register(function ($class_name) {
 $request_uri = trim($_SERVER['REQUEST_URI'], '/');
 $parts = explode('/', $request_uri);
 
-// Remove the base folder 'online_shop' if present
-if ($parts[0] == 'online_shop') {
+
+if ($parts[0] == 'web400121051') {
+    // This is the base folder for your project, so we remove it
+    // to simplify the routing logic.
     array_shift($parts);
 }
 
