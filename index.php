@@ -42,17 +42,17 @@ $action_name = !empty($parts[1]) ? $parts[1] : 'index';
 $params = array_slice($parts, 2);
 
 // --- ADD DEBUGGING HERE ---
-echo "Attempting to load Controller: " . $controller_name . "<br>";
-echo "Attempting to load Action: " . $action_name . "<br>";
+//echo "Attempting to load Controller: " . $controller_name . "<br>";
+//echo "Attempting to load Action: " . $action_name . "<br>";
 $controller_file_path = 'app/controllers/' . $controller_name . '.php';
-echo "Looking for file: " . $controller_file_path . "<br>";
-echo "Does file exist? ";
-var_dump(file_exists($controller_file_path)); // This shows true or false
-echo "Does class exist (before trying)? ";
-var_dump(class_exists($controller_name, false)); // Check without autoloading yet
-echo "Does class exist (with autoload)? ";
-var_dump(class_exists($controller_name)); // This *tries* to load it
-echo "<hr>";
+// echo "Looking for file: " . $controller_file_path . "<br>";
+// echo "Does file exist? ";
+// var_dump(file_exists($controller_file_path)); // This shows true or false
+// echo "Does class exist (before trying)? ";
+// var_dump(class_exists($controller_name, false)); // Check without autoloading yet
+// echo "Does class exist (with autoload)? ";
+// var_dump(class_exists($controller_name)); // This *tries* to load it
+// echo "<hr>";
 // --- END DEBUGGING ---
 
 
