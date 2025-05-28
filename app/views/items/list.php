@@ -7,7 +7,7 @@
 <body>
     <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
 
-    <a href="/online_shop/items/new">Add New Item</a>
+    <a href="/web400121051/items/new">Add New Item</a>
     <hr>
 
     <?php if (empty($items)): ?>
@@ -18,9 +18,9 @@
                 <li>
                     <strong><?php echo htmlspecialchars($item['name']); ?></strong>
                     (€<?php echo htmlspecialchars($item['price']); ?>) -
-                    <a href="/online_shop/items/show/<?php echo $item['id']; ?>">Details</a> |
-                    <a href="/online_shop/items/edit/<?php echo $item['id']; ?>">Edit</a> |
-                    <a href="/online_shop/items/delete/<?php echo $item['id']; ?>">Delete</a> </li>
+                    <a href="/web400121051/items/show/<?php echo $item['id']; ?>">Details</a> |
+                    <a href="/web400121051/items/edit/<?php echo $item['id']; ?>">Edit</a> |
+                    <a href="/web400121051/items/delete/<?php echo $item['id']; ?>">Delete</a> </li>
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>
