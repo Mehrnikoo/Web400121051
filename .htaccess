@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteBase /online_shop/
+
+# Block direct access to folders
+RewriteRule ^(app|config)/ - [F]
+
+# Reroute all requests to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
