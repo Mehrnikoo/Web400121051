@@ -1,5 +1,5 @@
 RewriteEngine On
-RewriteBase /online_shop/
+RewriteBase /web400121051/
 
 # Block direct access to folders
 RewriteRule ^(app|config)/ - [F]
