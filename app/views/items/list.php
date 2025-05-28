@@ -20,7 +20,10 @@
                     (€<?php echo htmlspecialchars($item['price']); ?>) -
                     <a href="/web400121051/items/show/<?php echo $item['id']; ?>">Details</a> |
                     <a href="/web400121051/items/edit/<?php echo $item['id']; ?>">Edit</a> |
-                    <a href="/web400121051/items/delete/<?php echo $item['id']; ?>">Delete</a> </li>
+                    <form action="/web400121051/items/delete/<?php echo $item['id']; ?>" method="POST" style="display: inline;">
+    <button type="submit" onclick="return confirm('Are you sure you want to delete this item?');">Delete</button>
+</form>
+</li>
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>

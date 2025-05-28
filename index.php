@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 // Autoload classes (basic example)
 spl_autoload_register(function ($class_name) {
     $paths = ['app/controllers/', 'app/models/', 'config/'];

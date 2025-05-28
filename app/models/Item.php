@@ -19,6 +19,19 @@ class Item {
         }
     }
 
+    public function getItemById($id) {
+    try {
+        $sql = "SELECT * FROM items WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT); // Bind ID as an integer
+        $stmt->execute();
+        return $stmt->fetch(); // Use fetch() for a single result (returns false if not found)
+    } catch(PDOException $e) {
+        error_log("Database error while fetching item ID {$id}: " . $e->getMessage());
+        return false; // Return false on error
+    }
+}
+
     // Method to create an item
     public function createItem($name, $description, $price) {
         try {
@@ -38,7 +51,37 @@ class Item {
         }
     }
 
-    // --- TODO: Add methods here for getItemById, updateItem, deleteItem ---
+    public function updateItem($id, $name, $description, $price) {
+    try {
+        $sql = "UPDATE items SET name = :name, description = :description, price = :price WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+
+        // Bind parameters
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
+        $stmt->bindParam(':price', $price, PDO::PARAM_STR);
+
+        return $stmt->execute(); // Returns true on success
+
+    } catch(PDOException $e) {
+        error_log("Database error while updating item ID {$id}: " . $e->getMessage());
+        return false;
+    }
+}
+
+    public function deleteItem($id) {
+        try {
+            $sql = "DELETE FROM items WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute(); // Returns true on success
+        } catch(PDOException $e) {
+            error_log("Database error while deleting item ID {$id}: " . $e->getMessage());
+            return false;
+        }
+    }
+    // --- FINNISHED: Add methods here for getItemById, updateItem, deleteItem ---
 
 } // End of Item class
 // It's often best practice to NOT have a closing ?>
