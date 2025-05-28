@@ -2,7 +2,7 @@
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root'); // Default XAMPP username
 define('DB_PASS', '');     // Default XAMPP password (empty)
-define('DB_NAME', 'online_shop_db');
+define('DB_NAME', 'web400121051shop');
 
 class Database {
     private static $instance = null;
