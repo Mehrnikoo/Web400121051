@@ -11,6 +11,14 @@ spl_autoload_register(function ($class_name) {
     }
 });
 
+
+// Basic Routing (using GET parameters)
+//$controller_name = !empty($_GET['controller']) ? ucfirst($_GET['controller']) . 'Controller' : 'HomeController';
+//$action_name = !empty($_GET['action']) ? $_GET['action'] : 'index';
+// Note: Handling parameters (like an ID) gets a bit more complex here.
+
+// ... rest of the controller loading/calling logic ...
+
 // Basic Routing
 $request_uri = trim($_SERVER['REQUEST_URI'], '/');
 $parts = explode('/', $request_uri);
