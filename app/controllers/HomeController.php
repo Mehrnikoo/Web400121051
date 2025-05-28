@@ -2,7 +2,7 @@
 class HomeController {
     public function index() {
         // Maybe redirect to items or show a welcome page
-        header('Location: /online_shop/items');
+        header('Location: /web400121051/items');
         exit();
         // Or: $this->loadView('home/index', ['pageTitle' => 'Welcome!']);
     }
