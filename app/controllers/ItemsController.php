@@ -115,6 +115,47 @@ class ItemsController {
     }
 }
 
+/**
+     * Displays the details for a single item.
+     * Called for URLs like /items/show/{id}
+     *
+     * @param int $id The ID of the item to show.
+     */
+    public function show($id = 0) {
+        $id = (int)$id; // Make sure the ID is treated as a number
+
+        // Check if a valid ID was provided
+        if ($id > 0) {
+            // Create an instance of our Item model
+            $itemModel = new Item();
+            // Try to fetch the item by its ID (we already added this method to Item.php)
+            $item = $itemModel->getItemById($id);
+
+            // Check if an item was actually found
+            if ($item) {
+                // If we found the item, load the 'show_details' view
+                // Pass the item data and set the page title
+                $this->loadView('items/show_details', ['item' => $item, 'pageTitle' => $item['name']]);
+            } else {
+                // If no item was found with that ID, show a 404 error
+                // We'll try loading our new 404.php view
+                // We need to make sure 'loadView' can handle 404 or use require_once directly
+                if (file_exists('app/views/404.php')) {
+                   http_response_code(404); // Set the 404 status code
+                   require_once 'app/views/404.php';
+                } else {
+                   die("Error: Item not found and 404 page is missing!");
+                }
+                exit();
+            }
+        } else {
+            // If no ID (or an invalid ID) was given in the URL,
+            // just redirect back to the main items list.
+            header('Location: /web400121051/items');
+            exit();
+        }
+    }
+
     /**
      * Helper function to load views.
      * @param string $viewPath Path to the view file (e.g., 'items/list')
