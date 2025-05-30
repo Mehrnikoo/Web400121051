@@ -1,4 +1,9 @@
 <?php
+namespace App\Controllers; // <-- ADD THIS
+
+use App\Models\Item; // <-- ADD THIS (Points to the Item class)
+
+
 class ItemsController {
 
     public function index() { // This will be called for /items or /items/index

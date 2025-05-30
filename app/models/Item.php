@@ -1,5 +1,11 @@
 <?php
 
+namespace App\Models; // <-- ADD THIS
+
+use App\Config\Database; // <-- ADD THIS (Points to the Database class)
+use PDO; // <-- ADD THIS
+use PDOException; // <-- ADD THIS
+
 class Item {
     private $db;
 
