@@ -1,7 +1,8 @@
 <?php
 namespace App\Controllers; // <-- ADD THIS
 
-class HomeController {
+class HomeController extends BaseController { // <-- CHANGED HERE
+    // This controller handles the home page and redirects to items
     public function index() {
     echo "<h1>Welcome to the Home Page!</h1>";
     header('Location: /web400121051/items');

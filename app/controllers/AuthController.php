@@ -5,7 +5,7 @@ namespace App\Controllers;
 // We'll need a way to load views. If you have a BaseController with loadView,
 // you can extend it. For now, we'll add a simple loadView here.
 // Ideally, this loadView method should be in a BaseController.
-class AuthController {
+class AuthController extends BaseController {
 
     /**
      * Displays the login form.

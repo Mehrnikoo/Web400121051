@@ -3,8 +3,10 @@ namespace App\Controllers; // <-- ADD THIS
 
 use App\Models\Item; // <-- ADD THIS (Points to the Item class)
 
+use App\Controllers\BaseController; // <-- ADD THIS (Points to the BaseController class)
 
-class ItemsController {
+class ItemsController extends BaseController { // <-- CHANGED HERE
+
 
     public function index() { // This will be called for /items or /items/index
         $itemModel = new Item();
@@ -161,22 +163,6 @@ class ItemsController {
         }
     }
 
-    /**
-     * Helper function to load views.
-     * @param string $viewPath Path to the view file (e.g., 'items/list')
-     * @param array $data Data to pass to the view
-     */
-    protected function loadView($viewPath, $data = []) {
-        // Extract data so it's available as variables in the view
-        extract($data);
-
-        $viewFile = 'app/views/' . $viewPath . '.php';
-
-        if (file_exists($viewFile)) {
-            require_once $viewFile;
-        } else {
-            die("View not found: " . $viewFile);
-        }
-    }
+   
 }
 ?>
