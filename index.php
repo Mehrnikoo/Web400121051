@@ -1,83 +1,64 @@
 <?php
+
+// For development: display errors
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-// Autoload classes (basic example)
-spl_autoload_register(function ($class_name) {
-    $paths = ['app/controllers/', 'app/models/', 'config/'];
-    foreach ($paths as $path) {
-        $file = $path . $class_name . '.php';
-        if (file_exists($file)) {
-            require_once $file;
-            return;
-        }
-    }
-});
 
+// 1. Include Composer's Autoloader
+// This single line handles loading all your namespaced classes!
+require_once __DIR__ . '/vendor/autoload.php';
 
-// Basic Routing (using GET parameters)
-//$controller_name = !empty($_GET['controller']) ? ucfirst($_GET['controller']) . 'Controller' : 'HomeController';
-//$action_name = !empty($_GET['action']) ? $_GET['action'] : 'index';
-// Note: Handling parameters (like an ID) gets a bit more complex here.
-
-// ... rest of the controller loading/calling logic ...
+// --- Old spl_autoload_register function is now DELETED ---
 
 // Basic Routing
 $request_uri = trim($_SERVER['REQUEST_URI'], '/');
 $parts = explode('/', $request_uri);
 
-
-if ($parts[0] == 'web400121051') {
-    // This is the base folder for your project, so we remove it
-    // to simplify the routing logic.
+// Remove the base folder 'web400121051' if present
+if (isset($parts[0]) && $parts[0] == 'web400121051') {
     array_shift($parts);
 }
 
-$controller_name = !empty($parts[0]) ? ucfirst($parts[0]) . 'Controller' : 'HomeController';
-$action_name = !empty($parts[1]) ? $parts[1] : 'index';
-$params = array_slice($parts, 2);
+// Determine controller and action
+$controller_slug = !empty($parts[0]) ? $parts[0] : 'home'; // e.g., 'home' or 'items'
+$action_name = !empty($parts[1]) ? $parts[1] : 'index';    // e.g., 'index' or 'show' or 'new'
+$params = array_slice($parts, 2);                          // e.g., ['1'] for an ID
 
-// Default to HomeController if the controller doesn't exist
-// ... after $params = array_slice($parts, 2);
+// 2. Construct the Fully Qualified Controller Class Name
+$controller_class = 'App\\Controllers\\' . ucfirst($controller_slug) . 'Controller';
+$default_controller_class = 'App\\Controllers\\HomeController';
 
-$controller_name = !empty($parts[0]) ? ucfirst($parts[0]) . 'Controller' : 'HomeController';
-$action_name = !empty($parts[1]) ? $parts[1] : 'index';
-$params = array_slice($parts, 2);
-
-// --- ADD DEBUGGING HERE ---
-//echo "Attempting to load Controller: " . $controller_name . "<br>";
-//echo "Attempting to load Action: " . $action_name . "<br>";
-$controller_file_path = 'app/controllers/' . $controller_name . '.php';
-// echo "Looking for file: " . $controller_file_path . "<br>";
-// echo "Does file exist? ";
-// var_dump(file_exists($controller_file_path)); // This shows true or false
-// echo "Does class exist (before trying)? ";
-// var_dump(class_exists($controller_name, false)); // Check without autoloading yet
-// echo "Does class exist (with autoload)? ";
-// var_dump(class_exists($controller_name)); // This *tries* to load it
-// echo "<hr>";
-// --- END DEBUGGING ---
-
-
-// Default to HomeController if the controller doesn't exist
-if (!class_exists($controller_name)) {
-    // --- ADD DEBUGGING HERE TOO ---
-    echo ">>> FAILED to find " . $controller_name . "! Falling back to HomeController. <<< <br>";
-    // --- END DEBUGGING ---
-    $controller_name = 'HomeController';
-    $action_name = 'index'; // Or an error page action
-    $params = [];
+// Check if the determined controller class exists
+if (!class_exists($controller_class)) {
+    // If not, try to default to HomeController
+    if (class_exists($default_controller_class)) {
+        $controller_class = $default_controller_class;
+        // If we default to HomeController, assume 'index' action unless specified
+        // This logic might need adjustment if Home has actions other than index
+        $action_name = !empty($parts[0]) && $parts[0] !== 'home' ? $parts[0] : 'index';
+        $params = array_slice($parts, 1);
+    } else {
+        // If even HomeController doesn't exist (major problem)
+        http_response_code(500);
+        die("Critical Error: Default controller not found.");
+    }
 }
 
-
 // Instantiate the controller
-$controller = new $controller_name();
+$controller = new $controller_class();
 
 // Call the action method if it exists
 if (method_exists($controller, $action_name)) {
     call_user_func_array([$controller, $action_name], $params);
 } else {
-    // Handle 404 Not Found - A simple way for now:
-    require_once 'app/views/404.php';
+    // If action doesn't exist in the controller, show 404
+    http_response_code(404);
+    $view_404 = 'app/views/404.php';
+    if (file_exists($view_404)) {
+        require_once $view_404;
+    } else {
+        die("Error: Action not found and 404 page is missing!");
+    }
 }
 ?>
