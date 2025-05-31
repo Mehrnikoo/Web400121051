@@ -9,6 +9,67 @@ use App\Models\UserModel; // <-- ADD THIS LINE
 // Ideally, this loadView method should be in a BaseController.
 class AuthController extends BaseController {
 
+    // Inside AuthController class
+
+    public function register() {
+        $error = $_SESSION['register_error'] ?? null;
+        $success = $_SESSION['register_success'] ?? null;
+        unset($_SESSION['register_error'], $_SESSION['register_success']);
+
+        $data = [
+            'pageTitle' => 'Register Account',
+            'error' => $error,
+            'success' => $success
+        ];
+        $this->loadView('auth/register', $data);
+    }
+
+    public function processRegistration() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = trim($_POST['username'] ?? '');
+            $password = $_POST['password'] ?? '';
+            $password_confirm = $_POST['password_confirm'] ?? '';
+
+            // Basic Validation
+            if (empty($username) || empty($password) || empty($password_confirm)) {
+                $_SESSION['register_error'] = 'All fields are required.';
+                header('Location: /web400121051/auth/register');
+                exit();
+            }
+
+            if (strlen($password) < 6) { // Example: minimum password length
+                $_SESSION['register_error'] = 'Password must be at least 6 characters long.';
+                header('Location: /web400121051/auth/register');
+                exit();
+            }
+
+            if ($password !== $password_confirm) {
+                $_SESSION['register_error'] = 'Passwords do not match.';
+                header('Location: /web400121051/auth/register');
+                exit();
+            }
+
+            $userModel = new UserModel();
+            $result = $userModel->createUser($username, $password); // Default role is 'user'
+
+            if ($result === true) {
+                $_SESSION['register_success'] = 'Registration successful! You can now log in.';
+                header('Location: /web400121051/auth/login'); // Redirect to login after successful registration
+                exit();
+            } elseif ($result === 'duplicate_username') {
+                $_SESSION['register_error'] = 'Username already taken. Please choose another.';
+            } else {
+                $_SESSION['register_error'] = 'An error occurred during registration. Please try again.';
+            }
+            header('Location: /web400121051/auth/register');
+            exit();
+
+        } else {
+            header('Location: /web400121051/auth/register');
+            exit();
+        }
+    }
+
     /**
      * Displays the login form.
      * Called for URLs like /auth/login
