@@ -106,7 +106,6 @@ class AuthController extends BaseController {
 
             if ($user && password_verify($password, $user['password_hash'])) {
                 // Password is correct, login successful!
-                // Regenerate session ID for security
                 session_regenerate_id(true);
 
                 // Store user information in session
@@ -115,22 +114,20 @@ class AuthController extends BaseController {
                 $_SESSION['user_role'] = $user['role'];
                 $_SESSION['logged_in'] = true;
 
-                // Redirect to a protected page (e.g., the items list or an admin dashboard)
-                header('Location: /web400121051/items'); // Or an admin dashboard page
+                // Role-based redirect
+                if ($user['role'] === 'admin') {
+                    header('Location: /web400121051/items'); // Admin goes to item management
+                } else {
+                    header('Location: /web400121051/shop'); // Regular user goes to shop
+                }
                 exit();
             } else {
                 // Invalid credentials
                 $_SESSION['login_error'] = 'Invalid username or password.';
-
-
-
-
-
                 header('Location: /web400121051/auth/login');
                 exit();
             }
         } else {
-            // Not a POST request, redirect to login
             header('Location: /web400121051/auth/login');
             exit();
         }
@@ -159,4 +156,5 @@ class AuthController extends BaseController {
     exit();
     }
 }
+
 ?>
