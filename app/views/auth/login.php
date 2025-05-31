@@ -13,7 +13,7 @@
             width: 300px; /* Or whatever width your login box is */
             text-align: center; /* Center the contents of the box */
         }
-        .register-link { /* Added a class for the new div for potential styling */
+                .register-link, .shop-link { /* Added shop-link class */
             margin-top: 15px; 
         }
     </style>
@@ -39,6 +39,10 @@
 
         <div class="register-link">
             <p>Don't have an account? <a href="/web400121051/auth/register">Register here</a></p>
+        </div>
+
+        <div class="shop-link">
+            <p><a href="/web400121051/shop">Continue to Shop without logging in</a></p>
         </div>
         </div> </body>
 </html>
