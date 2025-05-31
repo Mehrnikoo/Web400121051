@@ -90,4 +90,4 @@ class Item {
     // --- FINNISHED: Add methods here for getItemById, updateItem, deleteItem ---
 
 } // End of Item class
-// It's often best practice to NOT have a closing ?>
+?>

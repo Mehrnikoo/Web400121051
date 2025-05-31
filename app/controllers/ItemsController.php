@@ -7,6 +7,24 @@ use App\Controllers\BaseController; // <-- ADD THIS (Points to the BaseControlle
 
 class ItemsController extends BaseController { // <-- CHANGED HERE
 
+ // --- ADD THIS CONSTRUCTOR ---
+    public function __construct() {
+        // Call parent constructor if BaseController has one (optional for now as ours doesn't)
+        // parent::__construct(); 
+
+        // Check if user is logged in and is an admin
+        // Make sure session_start() is called in index.php!
+        if (
+            !(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true &&
+              isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin')
+        ) {
+            // If not logged in as admin, redirect to login page
+            $_SESSION['login_error'] = 'You must be logged in as an admin to access this page.';
+            header('Location: /web400121051/auth/login');
+            exit();
+        }
+    }
+    // --- END OF CONSTRUCTOR ---
 
     public function index() { // This will be called for /items or /items/index
         $itemModel = new Item();
