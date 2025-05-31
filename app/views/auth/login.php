@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <div class="login-container"> <h1>Admin Login</h1>
+    <div class="login-container"> <h1>Login</h1>
         
         <?php if (isset($error)): ?>
             <p class="error-message"><?php echo htmlspecialchars($error); ?></p>

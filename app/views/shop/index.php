@@ -16,6 +16,9 @@
         <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
             Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
             <a href="/web400121051/auth/logout">Logout</a>
+        <?php else: ?>
+            <a href="/web400121051/auth/login">Login</a> |
+            <a href="/web400121051/auth/register">Register</a>
         <?php endif; ?>
     </div>
 
@@ -25,15 +28,30 @@
     <?php if (empty($items)): ?>
         <p>No items in stock yet! Check back soon.</p>
     <?php else: ?>
-        <div class="item-list">
-            <?php foreach ($items as $item): ?>
-                <div class="item-card">
-                    <h3><?php echo htmlspecialchars($item['name']); ?></h3>
-                    <p>Price: €<?php echo htmlspecialchars($item['price']); ?></p>
-                    <p><?php echo nl2br(htmlspecialchars($item['description'])); ?></p>
-                </div>
-            <?php endforeach; ?>
-        </div>
+          <?php foreach ($items as $item): ?>
+    <div class="item-card">
+        <h3>
+            <a href="/web400121051/shop/show/<?php echo $item['id']; ?>">
+                <?php echo htmlspecialchars($item['name']); ?>
+            </a>
+        </h3>
+        <p>Price: €<?php echo htmlspecialchars($item['price']); ?></p>
+        <p>
+            <?php 
+            // Show a snippet of the description
+            $descriptionSnippet = substr(strip_tags($item['description']), 0, 100);
+            echo htmlspecialchars($descriptionSnippet);
+            if (strlen(strip_tags($item['description'])) > 100) {
+                echo "...";
+            }
+            ?>
+        </p>
+        <p><a href="/web400121051/shop/show/<?php echo $item['id']; ?>">View Details</a></p>
+    </div>
+    <?php endforeach; ?>
     <?php endif; ?>
+    
+    
+  
 </body>
 </html>
