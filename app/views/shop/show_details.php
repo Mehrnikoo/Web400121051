@@ -25,6 +25,11 @@
     <div class="product-details">
         <h1><?php echo htmlspecialchars($item['name']); ?></h1>
         <hr>
+        <?php if (!empty($item['image_filename'])): ?>
+            <img src="/web400121051/public/uploads/items/<?php echo htmlspecialchars($item['image_filename']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>" style="max-width:100%; height:auto; margin-bottom:20px; border:1px solid #ddd;">
+        <?php else: ?>
+            <p><em>No image available for this item.</em></p>
+        <?php endif; ?>
         <p><strong>Price:</strong> €<?php echo htmlspecialchars($item['price']); ?></p>
         
         <h2>Description:</h2>

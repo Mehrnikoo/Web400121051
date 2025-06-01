@@ -43,32 +43,106 @@ class ItemsController extends BaseController { // <-- CHANGED HERE
     }
     // Show 'add new' form
     // public function create() { ... }  
-        public function create() {
-        // Check if the form was submitted using POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Inside ItemsController.php, in the ItemsController class:
+public function create() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $name = $_POST['name'] ?? 'No Name';
+        $description = $_POST['description'] ?? '';
+        $price = $_POST['price'] ?? 0.00;
+        $imageFilenameToSave = null; // Variable to hold the filename to save to DB
 
-            // 1. Get data from the form (basic - no validation yet!)
-            $name = $_POST['name'] ?? 'No Name';
-            $description = $_POST['description'] ?? '';
-            $price = $_POST['price'] ?? 0.00;
+        // --- Image Upload Handling ---
+        if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] === UPLOAD_ERR_OK) {
 
-            // 2. Create an Item model instance
-            $itemModel = new Item();
+            // Define the target directory relative to the project root for consistency
+            // __DIR__ is the directory of ItemsController.php (app/controllers)
+            // So we go up two levels to the project root, then to public/uploads/items
+            $uploadTargetDir = dirname(__DIR__, 2) . '/public/uploads/items/';
 
-            // 3. Call the model's method to save to the database
-            $success = $itemModel->createItem($name, $description, $price);
+            // Ensure the directory exists and is writable (we created it, but good to check)
+            if (!is_dir($uploadTargetDir)) {
+                // Try to create it if it somehow got deleted (won't fix permissions)
+                if (!mkdir($uploadTargetDir, 0775, true) && !is_dir($uploadTargetDir)) {
+                     error_log('Failed to create upload directory: ' . $uploadTargetDir);
+                     // Potentially set a user error message here too
+                     // For now, we'll proceed without an image
+                }
+            }
 
-            // 4. Redirect back to the main items list
-            // (In a real app, you might show a success/error message here)
-            header('Location: /web400121051/items');
-            exit(); // Always exit after a header redirect!
+            if (is_writable($uploadTargetDir)) {
+                $originalFileName = basename($_FILES['item_image']['name']);
+                $fileExtension = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
 
-        } else {
-            // If someone tries to just visit /items/create directly, send them away
-            header('Location: /web400121051/items');
+                // Create a unique filename to prevent overwrites and for basic sanitization
+                // Replace non-alphanumeric (except ., -, _) with nothing from the base filename
+                $safeBaseName = preg_replace("/[^a-zA-Z0-9\-_]/", "", pathinfo($originalFileName, PATHINFO_FILENAME));
+                if(empty($safeBaseName)) { $safeBaseName = 'image'; } // handle empty base name after sanitizing
+                $uniqueFileName = time() . '_' . $safeBaseName . '.' . $fileExtension;
+                $targetFilePath = $uploadTargetDir . $uniqueFileName;
+
+                // Allowed file types
+                $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+                if (in_array($fileExtension, $allowedTypes)) {
+                    if (move_uploaded_file($_FILES['item_image']['tmp_name'], $targetFilePath)) {
+                        $imageFilenameToSave = $uniqueFileName; // Save only the unique filename
+                    } else {
+                        error_log("Failed to move uploaded file. Target: " . $targetFilePath . ". Check permissions and path.");
+                        $_SESSION['form_error'] = "Sorry, there was an error uploading your image (could not move file).";
+                    }
+                } else {
+                    error_log("Invalid file type: " . $originalFileName . ". Allowed types: " . implode(', ', $allowedTypes));
+                    $_SESSION['form_error'] = "Invalid file type. Allowed: " . implode(', ', $allowedTypes) . ".";
+                }
+            } else {
+                 error_log('Upload directory is not writable: ' . $uploadTargetDir);
+                 $_SESSION['form_error'] = "Server error: Upload directory not writable.";
+            }
+
+        } elseif (isset($_FILES['item_image']) && $_FILES['item_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            // Handle other specific PHP upload errors
+            $uploadErrors = [
+                UPLOAD_ERR_INI_SIZE   => "File exceeds upload_max_filesize.",
+                UPLOAD_ERR_FORM_SIZE  => "File exceeds MAX_FILE_SIZE in form.",
+                UPLOAD_ERR_PARTIAL    => "File was only partially uploaded.",
+                UPLOAD_ERR_CANT_WRITE => "Failed to write file to disk.",
+                UPLOAD_ERR_EXTENSION  => "A PHP extension stopped the file upload."
+            ];
+            $errorCode = $_FILES['item_image']['error'];
+            $errorMessage = $uploadErrors[$errorCode] ?? "Unknown upload error.";
+            error_log("File upload error: " . $errorMessage . " (Code: $errorCode)");
+            $_SESSION['form_error'] = "Sorry, there was an error uploading your image: " . $errorMessage;
+        }
+        // --- End Image Upload Handling ---
+
+        // If there was an image upload error that we want to show to the user, redirect back
+        if (isset($_SESSION['form_error'])) {
+            // Optional: Store form data in session to re-populate the form
+            // $_SESSION['form_data'] = $_POST; 
+            header('Location: /web400121051/items/new');
             exit();
         }
+
+        $itemModel = new Item();
+        $success = $itemModel->createItem($name, $description, $price, $imageFilenameToSave);
+
+        if ($success) {
+            // Optional: Set a success message
+            // $_SESSION['form_success'] = "Item created successfully!";
+        } else {
+            // Optional: Set a generic error if DB save failed
+            // $_SESSION['form_error'] = "Failed to save item to database.";
+            // If saving to DB fails and an image was uploaded, you might want to delete the uploaded image file here.
+        }
+
+        header('Location: /web400121051/items');
+        exit();
+
+    } else {
+        // Not a POST request, redirect to the form
+        header('Location: /web400121051/items/new');
+        exit();
     }
+}
     // Handle form submission for 'new'
     // public function edit($id) { ... }  
     public function edit($id = 0) { // Called for /items/edit/{id}

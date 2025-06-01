@@ -41,15 +41,15 @@ class Item {
     // Method to create an item
     public function createItem($name, $description, $price) {
         try {
-            $sql = "INSERT INTO items (name, description, price) VALUES (:name, :description, :price)";
-            $stmt = $this->db->prepare($sql);
+            $sql = "INSERT INTO items (name, description, price, image_filename) VALUES (:name, :description, :price, :image_filename)";
+        $stmt = $this->db->prepare($sql);
 
-            // Bind parameters
-            $stmt->bindParam(':name', $name, PDO::PARAM_STR);
-            $stmt->bindParam(':description', $description, PDO::PARAM_STR);
-            $stmt->bindParam(':price', $price, PDO::PARAM_STR); // PDO often treats decimals as strings
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':description', $description, PDO::PARAM_STR);
+        $stmt->bindParam(':price', $price, PDO::PARAM_STR);
+        $stmt->bindParam(':image_filename', $image_filename, PDO::PARAM_STR); // Bind the new parameter
 
-            return $stmt->execute(); // Returns true on success
+        return $stmt->execute(); // Returns true on success
 
         } catch(PDOException $e) {
             error_log("Database error while creating item: " . $e->getMessage());
@@ -67,6 +67,7 @@ class Item {
         $stmt->bindParam(':name', $name, PDO::PARAM_STR);
         $stmt->bindParam(':description', $description, PDO::PARAM_STR);
         $stmt->bindParam(':price', $price, PDO::PARAM_STR);
+        $stmt->bindParam(':image_filename', $image_filename, PDO::PARAM_STR);
 
         return $stmt->execute(); // Returns true on success
 
