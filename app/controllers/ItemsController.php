@@ -127,10 +127,10 @@ public function create() {
 
         if ($success) {
             // Optional: Set a success message
-            // $_SESSION['form_success'] = "Item created successfully!";
+            $_SESSION['form_success'] = "Item created successfully!";
         } else {
             // Optional: Set a generic error if DB save failed
-            // $_SESSION['form_error'] = "Failed to save item to database.";
+            $_SESSION['form_error'] = "Failed to save item to database.";
             // If saving to DB fails and an image was uploaded, you might want to delete the uploaded image file here.
         }
 

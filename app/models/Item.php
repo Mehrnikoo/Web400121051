@@ -39,7 +39,7 @@ class Item {
 }
 
     // Method to create an item
-    public function createItem($name, $description, $price) {
+    public function createItem($name, $description, $price, $image_filename = null) {
         try {
             $sql = "INSERT INTO items (name, description, price, image_filename) VALUES (:name, :description, :price, :image_filename)";
         $stmt = $this->db->prepare($sql);
