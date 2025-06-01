@@ -5,7 +5,13 @@
     <title><?php echo htmlspecialchars($pageTitle); ?></title>
     <style>
         body { font-family: sans-serif; margin: 20px; }
-        .item-list { display: flex; flex-wrap: wrap; gap: 20px; }
+        /* .item-list { display: flex; flex-wrap: wrap; gap: 20px; } */
+        .item-list {
+    display: flex;         /* Enables Flexbox */
+    flex-wrap: wrap;       /* Allows items to wrap to the next line */
+    gap: 20px;             /* Adds space between the item cards */
+    justify-content: flex-start; /* Aligns items to the start. You can also use 'center', 'space-around', etc. */
+}
         .item-card { border: 1px solid #ddd; padding: 15px; width: 200px; box-shadow: 2px 2px 5px #eee; }
         .item-card h3 { margin-top: 0; }
         .user-info { text-align: right; margin-bottom: 20px; }
@@ -50,11 +56,9 @@
                         }
                         ?>
                     </p>
-                    <p><a href="/web400121051/shop/show/<?php echo $item['id']; ?>">View Details</a></p></div>
+</div>
     <?php endforeach; ?>
     <?php endif; ?>
-    
-    
-  
+
 </body>
 </html>

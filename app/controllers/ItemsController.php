@@ -167,43 +167,137 @@ public function create() {
 } 
     // Show 'edit' form
     // public function update($id) { ... } // Handle form submission for 'edit'
-    public function update($id = 0) { // Called for /items/update/{id} via POST
+    // Inside ItemsController.php
+public function update($id = 0) {
     $id = (int)$id;
+    if (!$id) {
+        header('Location: /web400121051/items');
+        exit();
+    }
 
-    if ($id > 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $itemModel = new Item();
+    $currentItem = $itemModel->getItemById($id); // Get current item data
 
-        // 1. Get the data from the form
-        $name = $_POST['name'] ?? 'No Name';
-        $description = $_POST['description'] ?? '';
-        $price = $_POST['price'] ?? 0.00;
+    if (!$currentItem) {
+        die("Item not found for update."); // Or redirect to a 404
+    }
 
-        // 2. Use the Model to save the data
-        $itemModel = new Item();
-        $success = $itemModel->updateItem($id, $name, $description, $price);
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $name = $_POST['name'] ?? $currentItem['name']; // Default to current if not set
+        $description = $_POST['description'] ?? $currentItem['description'];
+        $price = $_POST['price'] ?? $currentItem['price'];
 
-        // 3. Redirect back to the items list (or details page)
+        $imageFilenameToUpdate = $currentItem['image_filename']; // Start with the current image filename
+
+        $uploadDir = dirname(__DIR__, 2) . '/public/uploads/items/';
+
+        // 1. Check if "Remove Image" checkbox is checked
+        if (isset($_POST['remove_image']) && $_POST['remove_image'] == '1') {
+            if (!empty($currentItem['image_filename'])) {
+                $oldFilePath = $uploadDir . $currentItem['image_filename'];
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath); // Delete the old file
+                }
+            }
+            $imageFilenameToUpdate = null; // Set to null for DB
+        }
+
+        // 2. Check if a new image is uploaded (this overrides removal if both are present)
+        if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] === UPLOAD_ERR_OK) {
+            // Delete old image first if it exists and is different or if we are replacing
+            if (!empty($currentItem['image_filename'])) {
+                $oldFilePath = $uploadDir . $currentItem['image_filename'];
+                if (file_exists($oldFilePath)) {
+                    unlink($oldFilePath);
+                }
+            }
+
+            // Process the new file (similar to create() method)
+            $originalFileName = basename($_FILES['item_image']['name']);
+            $fileExtension = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
+            $safeBaseName = preg_replace("/[^a-zA-Z0-9\-_]/", "", pathinfo($originalFileName, PATHINFO_FILENAME));
+            if(empty($safeBaseName)) { $safeBaseName = 'image'; }
+            $uniqueFileName = time() . '_' . $safeBaseName . '.' . $fileExtension;
+            $targetFilePath = $uploadDir . $uniqueFileName;
+
+            $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+            if (in_array($fileExtension, $allowedTypes)) {
+                if (move_uploaded_file($_FILES['item_image']['tmp_name'], $targetFilePath)) {
+                    $imageFilenameToUpdate = $uniqueFileName;
+                } else {
+                    error_log("Update: Failed to move uploaded file. Target: " . $targetFilePath);
+                    $_SESSION['form_error'] = "Error uploading new image (could not move file).";
+                    // Decide if you want to proceed with other updates or redirect
+                }
+            } else {
+                error_log("Update: Invalid file type: " . $originalFileName);
+                $_SESSION['form_error'] = "Invalid new file type. Allowed: " . implode(', ', $allowedTypes);
+            }
+        }
+
+        // If there was an image related error that should stop the update
+        if (isset($_SESSION['form_error'])) {
+            header('Location: /web400121051/items/edit/' . $id);
+            exit();
+        }
+
+        // 3. Update the database
+        $success = $itemModel->updateItem($id, $name, $description, $price, $imageFilenameToUpdate);
+
+        // Redirect back
         header('Location: /web400121051/items');
         exit();
 
     } else {
-        // If no ID or not POST, just send them home/list
-        header('Location: /web400121051/items');
+        // If not POST, it means we are just showing the edit form (handled by edit() method)
+        // This part of update() is only for processing the POST request.
+        // So, if someone tries to GET /items/update/id, redirect them.
+        header('Location: /web400121051/items/edit/' . $id);
         exit();
     }
 }
 
-    // public function delete($id) { ... } // Handle deletion
-
-    public function delete($id = 0) { // Called for /items/delete/{id} via POST
+public function delete($id = 0) {
     $id = (int)$id;
 
-    // We MUST check it's a POST request for safety
     if ($id > 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $itemModel = new Item();
-        $success = $itemModel->deleteItem($id);
 
-        // Redirect back to the items list regardless of success for now
-        // You could add error/success messages later.
+        // 1. Fetch the item to get its image filename BEFORE deleting from DB
+        $itemToDelete = $itemModel->getItemById($id);
+
+        if ($itemToDelete) {
+            // 2. Attempt to delete the item from the database
+            $dbDeleteSuccess = $itemModel->deleteItem($id);
+
+            if ($dbDeleteSuccess) {
+                // 3. If DB deletion was successful, and there was an image, delete the image file
+                if (!empty($itemToDelete['image_filename'])) {
+                    $uploadDir = dirname(__DIR__, 2) . '/public/uploads/items/';
+                    $filePath = $uploadDir . $itemToDelete['image_filename'];
+                    if (file_exists($filePath)) {
+                        if (unlink($filePath)) {
+                            // Image file deleted successfully
+                            error_log("Successfully deleted image file: " . $filePath);
+                        } else {
+                            // Failed to delete image file (log this, permissions?)
+                            error_log("Failed to delete image file: " . $filePath);
+                        }
+                    } else {
+                        error_log("Image file not found for deletion (already gone?): " . $filePath);
+                    }
+                }
+            } else {
+                // DB deletion failed, maybe set an error message
+                error_log("Failed to delete item ID {$id} from database.");
+                // You might want to set a session error message here
+            }
+        } else {
+            error_log("Attempted to delete non-existent item ID {$id}.");
+            // You might want to set a session error message here
+        }
+
+        // Redirect back to the items list
         header('Location: /web400121051/items');
         exit();
 

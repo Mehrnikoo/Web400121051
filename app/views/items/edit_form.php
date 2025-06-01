@@ -24,9 +24,17 @@
         <div>
             <label for="item_image">Change/Upload New Item Image:</label><br>
             <input type="file" id="item_image" name="item_image">
-            <small>Leave blank to keep the current image.</small>
+            <small>Leave blank to keep current image unless "Remove" is checked.</small>
         </div>
         <br>
+
+        <?php if (!empty($item['image_filename'])): // Only show remove option if there is an image ?>
+        <div>
+            <input type="checkbox" id="remove_image" name="remove_image" value="1">
+            <label for="remove_image">Remove current image</label>
+        </div>
+        <br>
+        <?php endif; ?>
 
         <div>
             <label for="description">Description:</label><br>
@@ -44,6 +52,5 @@
     </form>
 
     <p><a href="/web400121051/items">Back to List</a></p>
-
 </body>
 </html>

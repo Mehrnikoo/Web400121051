@@ -57,9 +57,9 @@ class Item {
         }
     }
 
-    public function updateItem($id, $name, $description, $price) {
+    public function updateItem($id, $name, $description, $price, $image_filename = null) {
     try {
-        $sql = "UPDATE items SET name = :name, description = :description, price = :price WHERE id = :id";
+        $sql = "UPDATE items SET name = :name, description = :description, price = :price, image_filename = :image_filename WHERE id = :id";
         $stmt = $this->db->prepare($sql);
 
         // Bind parameters
@@ -68,6 +68,7 @@ class Item {
         $stmt->bindParam(':description', $description, PDO::PARAM_STR);
         $stmt->bindParam(':price', $price, PDO::PARAM_STR);
         $stmt->bindParam(':image_filename', $image_filename, PDO::PARAM_STR);
+        $stmt->bindParam(':image_filename', $image_filename, PDO::PARAM_STR); // Handles new filename or NULL
 
         return $stmt->execute(); // Returns true on success
 
