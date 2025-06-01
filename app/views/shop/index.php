@@ -19,14 +19,14 @@
 </head>
 <body>
     <div class="user-info">
-        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
-            Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
-            <a href="/web400121051/auth/logout">Logout</a>
-        <?php else: ?>
-            <a href="/web400121051/auth/login">Login</a> |
-            <a href="/web400121051/auth/register">Register</a>
-        <?php endif; ?>
-    </div>
+    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+        Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
+        <a href="/web400121051/shop/foryou">For You</a> | <a href="/web400121051/auth/logout">Logout</a>
+    <?php else: ?>
+        <a href="/web400121051/auth/login">Login</a> |
+        <a href="/web400121051/auth/register">Register</a>
+    <?php endif; ?>
+</div>
 
     <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
     <hr>

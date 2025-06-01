@@ -57,5 +57,24 @@ class ShopController extends BaseController {
     }
     // ▲▲▲ END OF THE show() METHOD ▲▲▲
 
+
+    // Inside the ShopController class
+    public function forYou() {
+        // This page is for logged-in users only
+        if (!(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true)) {
+            $_SESSION['login_error'] = 'You must be logged in to see your "For You" page.';
+            header('Location: /web400121051/auth/login');
+            exit();
+        }
+
+        $itemModel = new Item();
+        $randomItems = $itemModel->getRandomItems(3); // Get 3 random items
+
+        $this->loadView('shop/foryou', [
+            'pageTitle' => 'Just For You!',
+            'items' => $randomItems // Pass items with the same variable name as shop/index
+        ]);
+        }
+        
 }
 ?>

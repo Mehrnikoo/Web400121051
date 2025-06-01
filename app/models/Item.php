@@ -91,5 +91,23 @@ class Item {
     }
     // --- FINNISHED: Add methods here for getItemById, updateItem, deleteItem ---
 
+    // Inside the Item class
+public function getRandomItems(int $limit = 3) { // Default to 3 items
+    try {
+        // NOTE: ORDER BY RAND() can be slow on very large tables.
+        // For smaller tables, it's generally fine.
+        // Other methods exist for better performance on large datasets (e.g., fetching IDs, shuffling in PHP).
+        $sql = "SELECT * FROM items ORDER BY RAND() LIMIT :limit";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    } catch(PDOException $e) {
+        error_log("Database error in Item::getRandomItems(): " . $e->getMessage());
+        return []; // Return empty array on error
+    }
+}
+
+
 } // End of Item class
 ?>
