@@ -21,6 +21,38 @@
         <a href="/web400121051/auth/register">Register</a>
     <?php endif; ?>
 </div>
+<div class="comments-section" style="margin-top: 30px;">
+            <h2>Comments</h2>
+            <?php if (empty($comments)): ?>
+                <p>No comments yet. Be the first to comment!</p>
+            <?php else: ?>
+                <?php foreach ($comments as $comment): ?>
+                    <div class="comment" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                        <p>
+                            <strong><?php echo htmlspecialchars($comment['username']); ?></strong>
+                            <small style="color: #777;">(<?php echo date('M j, Y, g:i a', strtotime($comment['created_at'])); ?>)</small>
+                        </p>
+                        <p><?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?></p>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <div class="add-comment-form" style="margin-top: 30px;">
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+                <h3>Leave a Comment</h3>
+                <form action="/web400121051/shop/addComment/<?php echo $item['id']; ?>" method="POST">
+                    <textarea name="comment_text" rows="4" style="width: 100%; margin-bottom: 10px;" placeholder="Write your comment here..." required></textarea>
+                    <button type="submit">Post Comment</button>
+                </form>
+            <?php else: ?>
+                <p><a href="/web400121051/auth/login">Login</a> or <a href="/web400121051/auth/register">Register</a> to post a comment.</p>
+            <?php endif; ?>
+        </div>
+        <hr style="margin-top:30px;">
+        <p><a href="/web400121051/shop">Back to Shop</a></p>
+    </div> </body>
+</html>
 
     <div class="product-details">
         <h1><?php echo htmlspecialchars($item['name']); ?></h1>
