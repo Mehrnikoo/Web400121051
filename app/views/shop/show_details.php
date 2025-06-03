@@ -13,6 +13,14 @@
 </head>
 <body>
     <div class="user-info">
+    <?php
+    if (isset($_SESSION['general_message'])) {
+        $message = $_SESSION['general_message'];
+        echo '<p style="color:' . ($message['type'] === 'success' ? 'green' : 'red') . ';">' . htmlspecialchars($message['text']) . '</p>';
+        unset($_SESSION['general_message']); // Clear message after displaying
+    }
+    ?>
+
     <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
         Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!
         <a href="/web400121051/auth/logout">Logout</a>
@@ -26,15 +34,21 @@
             <?php if (empty($comments)): ?>
                 <p>No comments yet. Be the first to comment!</p>
             <?php else: ?>
-                <?php foreach ($comments as $comment): ?>
-                    <div class="comment" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
-                        <p>
-                            <strong><?php echo htmlspecialchars($comment['username']); ?></strong>
-                            <small style="color: #777;">(<?php echo date('M j, Y, g:i a', strtotime($comment['created_at'])); ?>)</small>
+            <?php foreach ($comments as $comment): ?>
+                <div class="comment" style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                    <p>
+                        <strong><?php echo htmlspecialchars($comment['username']); ?></strong>
+                        <small style="color: #777;">(<?php echo date('M j, Y, g:i a', strtotime($comment['created_at'])); ?>)</small>
+
+                        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                            <form action="/web400121051/shop/deleteComment/<?php echo $item['id']; ?>/<?php echo $comment['id']; ?>" method="POST" style="display: inline; margin-left: 10px;">
+                                <button type="submit" onclick="return confirm('Are you sure you want to delete this comment?');" style="font-size: 0.8em; padding: 2px 5px;">Delete</button>
+                            </form>
+                        <?php endif; ?>
                         </p>
-                        <p><?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?></p>
-                    </div>
-                <?php endforeach; ?>
+                    <p><?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?></p>
+                </div>
+            <?php endforeach; ?>
             <?php endif; ?>
         </div>
 

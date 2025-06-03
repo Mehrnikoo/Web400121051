@@ -79,6 +79,61 @@ public function addComment($itemId = 0) {
         ]);
     }
 
+        // Inside the ShopController class
+
+    /**
+     * Handles deletion of a comment by an admin.
+     * Expects itemId for redirection and commentId for deletion.
+     * URL: /shop/deleteComment/{itemId}/{commentId}
+     */
+    public function deleteComment($itemId = 0, $commentId = 0) {
+        $itemId = (int)$itemId;
+        $commentId = (int)$commentId;
+
+        // 1. Check if user is logged in AND is an admin
+        if (
+            !(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true &&
+            isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin')
+        ) {
+            // Not an admin, or not logged in.
+            // Redirect to login or shop page with an error.
+            $_SESSION['general_message'] = ['type' => 'error', 'text' => 'You do not have permission to perform this action.'];
+            if ($itemId > 0) {
+                header('Location: /web400121051/shop/show/' . $itemId);
+            } else {
+                header('Location: /web400121051/shop');
+            }
+            exit();
+        }
+
+        // 2. Check if it's a POST request and IDs are valid
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && $commentId > 0 && $itemId > 0) {
+            $commentModel = new CommentModel();
+            $success = $commentModel->deleteCommentById($commentId);
+
+            if ($success) {
+                $_SESSION['general_message'] = ['type' => 'success', 'text' => 'Comment deleted successfully.'];
+            } else {
+                $_SESSION['general_message'] = ['type' => 'error', 'text' => 'Failed to delete comment.'];
+            }
+
+            // 3. Redirect back to the item detail page
+            header('Location: /web400121051/shop/show/' . $itemId);
+            exit();
+
+        } else {
+            // Not a POST request or invalid IDs, redirect
+            $_SESSION['general_message'] = ['type' => 'error', 'text' => 'Invalid request for deleting comment.'];
+            if ($itemId > 0) {
+                header('Location: /web400121051/shop/show/' . $itemId);
+            } else {
+                header('Location: /web400121051/shop');
+            }
+            exit();
+        }
+    }
+
+
     public function show($id = 0) {
         $id = (int)$id;
 

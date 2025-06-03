@@ -13,6 +13,24 @@ class CommentModel {
         $this->db = Database::getInstance()->getConnection();
     }
 
+        /**
+     * Deletes a specific comment by its ID.
+     *
+     * @param int $commentId The ID of the comment to delete.
+     * @return bool True on success, false on failure.
+     */
+    public function deleteCommentById(int $commentId): bool {
+        try {
+            $sql = "DELETE FROM comments WHERE id = :comment_id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':comment_id', $commentId, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Database error in CommentModel::deleteCommentById(): " . $e->getMessage());
+            return false;
+        }
+    }
+
     /**
      * Fetches all comments for a specific item, along with the commenter's username.
      * Orders comments by oldest first.
